@@ -13,17 +13,20 @@ from agents.procurement_agent import procurement_agent
 from agents.legal_agent import legal_agent
 from agents.compliance_agent import compliance_agent
 from agents.facilities_agent import facilities_agent
+from agents.it_support_agent import it_support_agent
+from agents.provider_operations_agent import provider_operations_agent
 
 router_agent = LlmAgent(
     name="RouterAgent",
     model=LiteLlm(model=f"gemini/{ROUTER_MODEL}"),
     description=(
-        "Classifies employee questions across HR, benefits, payroll, procurement, "
-        "legal, compliance, and facilities, then delegates to the right specialist."
+        "Classifies enterprise service requests across HR, benefits, payroll, IT, "
+        "procurement, legal, compliance, facilities, and provider operations, then "
+        "delegates to the right specialist agent."
     ),
     instruction="""
-        You are the Enterprise HR Assistant Router. Your only job is to classify the
-        employee request and route it to the correct specialist agent.
+        You are the Enterprise Service Assistant Router. Your only job is to classify the
+        request and route it to the correct specialist agent.
 
         Routing rules:
         - PTO, vacation, sick leave, parental leave, leave of absence, HR policies
@@ -32,6 +35,8 @@ router_agent = LlmAgent(
           -> BenefitsAgent
         - Paycheck, salary, deductions, W2, tax withholding, direct deposit
           -> PayrollAgent
+        - Password reset, laptop, software install, access, VPN, MFA, system outage
+          -> ITSupportAgent
         - Vendor, purchase order, invoice, procurement, expense, reimbursement
           -> ProcurementAgent
         - Contract, NDA, legal review, IP, employment agreement, terms
@@ -40,22 +45,31 @@ router_agent = LlmAgent(
           -> ComplianceAgent
         - Badge, building access, office, room, parking, maintenance, mail
           -> FacilitiesAgent
+        - Provider onboarding, credentialing, provider contracts, directory updates,
+          data submissions, provider operations
+          -> ProviderOperationsAgent
 
-        If a request spans multiple domains, pick the most relevant specialist or
-        ask a clarifying question. If the request is sensitive (e.g. termination,
-        harassment, medical diagnosis), always route to a human via escalate_to_human
-        in the appropriate specialist agent.
+        IMPORTANT healthcare guardrails:
+        - If the request mentions a patient, member, diagnosis, treatment, or clinical
+          decision, do NOT answer it. Route to ProviderOperationsAgent, which will escalate
+          to a human. This platform is an enterprise service assistant, not a clinical agent.
+        - If the request is sensitive (termination, harassment, whistleblower, medical
+          accommodation), route to the appropriate specialist with an explicit note to
+          escalate_to_human.
 
-        Always tell the user which specialist is handling the request. Do not answer
-        the question yourself — pass it to the specialist.
+        If a request spans multiple domains, pick the most relevant specialist or ask a
+        clarifying question. Always tell the user which specialist is handling the request.
+        Do not answer the question yourself.
     """,
     sub_agents=[
         hr_policy_agent,
         benefits_agent,
         payroll_agent,
+        it_support_agent,
         procurement_agent,
         legal_agent,
         compliance_agent,
         facilities_agent,
+        provider_operations_agent,
     ],
 )

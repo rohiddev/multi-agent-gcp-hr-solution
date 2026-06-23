@@ -6,3 +6,5 @@ from .procurement_agent import procurement_agent
 from .legal_agent import legal_agent
 from .compliance_agent import compliance_agent
 from .facilities_agent import facilities_agent
+from .it_support_agent import it_support_agent
+from .provider_operations_agent import provider_operations_agent

@@ -1,8 +1,14 @@
-# Enterprise Multi-Agent HR Assistant — Google ADK + Gemini
+# Enterprise Multi-Agent Service Assistant — Google ADK + Gemini
 
-An enterprise-grade multi-agent assistant that helps employees find answers and complete
-common internal service requests across HR, benefits, payroll, procurement, legal,
-compliance, and facilities.
+An enterprise-grade, healthcare-aware multi-agent assistant that helps employees and
+operations teams find answers and complete common internal service requests across HR,
+benefits, payroll, IT support, procurement, legal, compliance, facilities, and provider
+operations.
+
+This solution is designed for a healthcare enterprise context such as UnitedHealth Group
+or Optum, with strong governance, PHI protection, audit logging, and responsible AI
+controls. It is positioned as an **enterprise service and operations assistant**, not a
+clinical diagnosis or patient-care system.
 
 **Author:** Rohid Dev · github.com/rohiddev
 
@@ -11,9 +17,9 @@ compliance, and facilities.
 ## Architecture
 
 ```
-Employee
+Employee / Operations User
     ↓
-FastAPI / Chat Interface
+FastAPI / Chat Interface / Internal Portal
     ↓
 RouterAgent
     ↓
@@ -21,19 +27,25 @@ Specialist Agents
     ├── HRPolicyAgent
     ├── BenefitsAgent
     ├── PayrollAgent
+    ├── ITSupportAgent
     ├── ProcurementAgent
     ├── LegalAgent
     ├── ComplianceAgent
-    └── FacilitiesAgent
+    ├── FacilitiesAgent
+    └── ProviderOperationsAgent
     ↓
 RAG / Knowledge Retrieval
     ↓
 Enterprise Data Sources
-    (Cloud Storage, SharePoint, ServiceNow, Workday, Confluence)
+    (Cloud Storage, SharePoint, ServiceNow, Workday, Confluence, Provider Ops docs)
     ↓
 Gemini Model
     ↓
 Answer with citations + optional workflow action
+    ↓
+Approved Tools / APIs
+    ↓
+ServiceNow / Workday / Procurement / Legal / Facilities / ITSM
 ```
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for a detailed plain-English walkthrough,
@@ -80,6 +92,9 @@ multi_agent_gcp_hr_solution/
 ├── .gitignore
 ├── README.md
 ├── ARCHITECTURE.md                   # Detailed architecture + interview guide
+├── PITCH.md                          # Executive pitch for healthcare enterprises
+├── GOVERNANCE.md                     # Healthcare AI governance and responsible AI
+├── USE_CASES.md                      # Common HR/enterprise use cases and mappings
 ├── data/policies/                    # Sample policy documents
 │   ├── hr_policy/
 │   ├── benefits/
@@ -87,20 +102,23 @@ multi_agent_gcp_hr_solution/
 │   ├── procurement/
 │   ├── legal/
 │   ├── compliance/
-│   └── facilities/
+│   ├── facilities/
+│   └── provider_operations/        # Provider ops knowledge sources
 ├── agents/
 │   ├── __init__.py
 │   ├── router_agent.py               # Classifies and routes requests
 │   ├── hr_policy_agent.py
 │   ├── benefits_agent.py
 │   ├── payroll_agent.py
+│   ├── it_support_agent.py           # IT support and access requests
 │   ├── procurement_agent.py
 │   ├── legal_agent.py
 │   ├── compliance_agent.py
-│   └── facilities_agent.py
+│   ├── facilities_agent.py
+│   └── provider_operations_agent.py  # Provider onboarding and credentialing
 ├── tools/
 │   ├── __init__.py
-│   └── enterprise_hr_tools.py      # Knowledge search, case creation, tickets
+│   └── enterprise_hr_tools.py      # Knowledge search, case creation, tickets, summaries
 ├── retrieval/
 │   ├── __init__.py
 │   └── retrieval.py                 # RAG backend abstraction (stub/prod)
@@ -109,7 +127,8 @@ multi_agent_gcp_hr_solution/
 │   └── telemetry.py                 # Logging + Cloud Trace
 ├── security/
 │   ├── __init__.py
-│   └── iam.py                       # ADC, Secret Manager, guardrails
+│   ├── iam.py                       # ADC, Secret Manager, guardrails
+│   └── governance.py                # PHI detection, audit logging, human approval
 └── tests/                            # Unit tests
 ```
 
@@ -122,10 +141,12 @@ multi_agent_gcp_hr_solution/
 | **HR Policy** | PTO, parental leave, remote work, HR policies |
 | **Benefits** | Medical, dental, 401k, insurance, wellness |
 | **Payroll** | Paychecks, deductions, W2, direct deposit |
+| **IT Support** | Password reset, laptop, software install, access, MFA |
 | **Procurement** | Purchase orders, vendors, invoices, reimbursements |
 | **Legal** | Contracts, NDAs, legal review, IP |
 | **Compliance** | Training, audits, certifications, ethics |
 | **Facilities** | Badge access, parking, maintenance, rooms |
+| **Provider Operations** | Provider onboarding, credentialing, contracts, directory updates |
 
 ---
 
@@ -191,11 +212,31 @@ deployment patterns managed by the Gemini Enterprise Agent Platform.
 
 | Phase | What to build | Risk |
 |---|---|---|
-| 1 | Router + HR Policy + Benefits + stub retrieval | Low |
+| 1 | Router + HR Policy + Benefits + IT Support + stub retrieval | Low |
 | 2 | Add Payroll, Procurement, Legal, Compliance, Facilities | Low |
-| 3 | Connect real retrieval backend and enterprise data | Medium |
-| 4 | Wire real ServiceNow / Workday APIs and approval workflows | Medium |
-| 5 | Deploy to Agent Engine / Cloud Run with Gemini Enterprise Agent Platform | Medium |
+| 3 | Add Provider Operations Agent | Medium |
+| 4 | Connect real retrieval backend and enterprise data | Medium |
+| 5 | Wire real ServiceNow / Workday / provider systems and approval workflows | Medium |
+| 6 | Deploy to Agent Engine / Cloud Run with Gemini Enterprise Agent Platform | Medium |
+| 7 | Responsible AI evaluation and production governance | Low (adds safety) |
+
+---
+
+## Healthcare Governance
+
+This solution is built with healthcare-aware governance from the ground up. See:
+- [GOVERNANCE.md](./GOVERNANCE.md) for PHI detection, audit logging, human-in-the-loop,
+  responsible AI evaluation, and agent-specific guardrails.
+- [PITCH.md](./PITCH.md) for the executive positioning and business case.
+- [USE_CASES.md](./USE_CASES.md) for common HR and enterprise use case mappings.
+
+Key controls:
+- **No clinical decision-making:** Provider Operations Agent escalates any patient/member/clinical question to a human.
+- **PHI detection and redaction:** All inputs are scanned for SSN, email, phone, MRN, member ID, and DOB before processing.
+- **Audit logging:** Every request, tool call, and escalation is logged with user and session IDs.
+- **Human approval:** High-risk actions (payroll changes, PHI access, record deletion) require human sign-off.
+- **Source citations:** All policy answers cite approved documents.
+- **Prompt injection protection:** Guardrails block jailbreak attempts.
 
 ---
 

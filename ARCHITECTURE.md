@@ -1,7 +1,12 @@
-# Architecture — Plain English Guide (Enterprise HR Assistant)
+# Architecture — Plain English Guide (Enterprise Service Assistant)
 
 This document explains how the system works piece by piece, using simple diagrams and
 plain English. It also includes a "Key Design Decisions" section useful for interviews.
+
+This solution is designed for a healthcare enterprise context such as UnitedHealth Group
+or Optum. It is positioned as an **enterprise service and operations assistant** — not a
+clinical diagnosis or patient-care system. Built-in governance includes PHI detection,
+audit logging, human-in-the-loop controls, and responsible AI guardrails.
 
 ---
 
@@ -25,6 +30,7 @@ checks whether Alex is allowed to do it, then triggers the action through the co
  │  "How many PTO days do I have?"                                     │
  │  "How do I request a new laptop?"                                   │
  │  "What is the parental leave policy?"                               │
+ │  "What is the status of a provider credentialing request?"          │
  └───────────────────────────────┬─────────────────────────────────────┘
                                  │
                                  ▼
@@ -49,8 +55,8 @@ checks whether Alex is allowed to do it, then triggers the action through the co
  │                     agents/router_agent.py                          │
  │                                                                     │
  │  Powered by: Gemini 2.5 Flash                                       │
- │  "I read every employee request and decide which specialist        │
- │   should handle it."                                                │
+ │  "I read every employee or operations request and decide which      │
+ │   specialist should handle it."                                     │
  │                                                                     │
  │  ┌─────────────────────────────────────────────────────────────┐    │
  │  │  Routing Rules (plain English)                              │    │
@@ -64,6 +70,9 @@ checks whether Alex is allowed to do it, then triggers the action through the co
  │  │  Paycheck, salary, deductions, W2, tax, direct deposit    │    │
  │  │    -> Payroll Agent                                         │    │
  │  │                                                             │    │
+ │  │  Password reset, laptop, software, access, VPN, MFA       │    │
+ │  │    -> IT Support Agent                                      │    │
+ │  │                                                             │    │
  │  │  Vendor, purchase order, invoice, reimbursement           │    │
  │  │    -> Procurement Agent                                     │    │
  │  │                                                             │    │
@@ -75,14 +84,17 @@ checks whether Alex is allowed to do it, then triggers the action through the co
  │  │                                                             │    │
  │  │  Badge, building, parking, maintenance, room              │    │
  │  │    -> Facilities Agent                                      │    │
+ │  │                                                             │    │
+ │  │  Provider onboarding, credentialing, contracts, directory   │    │
+ │  │    -> Provider Operations Agent                             │    │
  │  └─────────────────────────────────────────────────────────────┘    │
  └──────┬──────────────────────────────────────────────────────────────┘
         │
         │ routes to
         ▼
  ┌─────────────────────────────────────────────────────────────────────┐
- │  Specialist Agents (HR Policy, Benefits, Payroll, Procurement,       │
- │  Legal, Compliance, Facilities)                                       │
+ │  Specialist Agents (HR Policy, Benefits, Payroll, IT Support,        │
+ │  Procurement, Legal, Compliance, Facilities, Provider Operations)     │
  └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -128,6 +140,19 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │   • search_enterprise_knowledge (sources: payroll)                 │
  │   • get_employee_eligibility                                       │
  │   • create_hr_case                                                │
+ │   • check_policy                                                  │
+ │   • escalate_to_human                                             │
+ └─────────────────────────────────────────────────────────────────────┘
+
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │                     IT SUPPORT AGENT                                  │
+ │                                                                     │
+ │  "I answer IT support questions and create tickets for access,    │
+ │   hardware, software, and system issues."                         │
+ │                                                                     │
+ │  Tools:                                                             │
+ │   • search_enterprise_knowledge (sources: it_support)              │
+ │   • create_service_ticket (system: IT)                            │
  │   • check_policy                                                  │
  │   • escalate_to_human                                             │
  └─────────────────────────────────────────────────────────────────────┘
@@ -182,6 +207,19 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │   • create_service_ticket (system: Facilities)                    │
  │   • escalate_to_human                                             │
  └─────────────────────────────────────────────────────────────────────┘
+
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │                 PROVIDER OPERATIONS AGENT                           │
+ │                                                                     │
+ │  "I answer provider operations and network management questions. │
+ │   I do NOT answer clinical or patient-care questions."            │
+ │                                                                     │
+ │  Tools:                                                             │
+ │   • search_enterprise_knowledge (sources: provider_operations)     │
+ │   • create_service_ticket (system: ProviderOperations)            │
+ │   • check_policy                                                  │
+ │   • escalate_to_human                                             │
+ └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -196,9 +234,11 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │                                                                     │
  │  ┌─────────────────────────────────────────────────────────────┐   │
  │  │  search_enterprise_knowledge                                │   │
- │  │    1. Guardrail check on user input                         │   │
- │  │    2. Retrieve documents from RAG backend                   │   │
- │  │    3. Return results with content, source, and score         │   │
+ │  │    1. PHI/PII detection and redaction                       │   │
+ │  │    2. Guardrail check on user input                         │   │
+ │  │    3. Retrieve documents from RAG backend                   │   │
+ │  │    4. Audit log event                                       │   │
+ │  │    5. Return results with content, source, and score         │   │
  │  └─────────────────────────────────────────────────────────────┘   │
  │  ┌─────────────────────────────────────────────────────────────┐   │
  │  │  create_hr_case                                             │   │
@@ -226,6 +266,12 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │  │  escalate_to_human                                          │   │
  │  │    1. Hand off to the right human team                       │   │
  │  │    2. Return escalation_id and SLA message                   │   │
+ │  └─────────────────────────────────────────────────────────────┘   │
+ │  ┌─────────────────────────────────────────────────────────────┐   │
+ │  │  summarize_case                                             │   │
+ │  │    1. Redact PHI from case text                             │   │
+ │  │    2. Generate concise summary for human reviewer             │   │
+ │  │    3. Return summary                                         │   │
  │  └─────────────────────────────────────────────────────────────┘   │
  │                                                                     │
  │  All tools return:                                                  │
@@ -304,6 +350,27 @@ Each specialist agent is a focused mini-assistant for one business domain.
  └─────────────────────────────────────────────────────────────────────┘
 
  ┌─────────────────────────────────────────────────────────────────────┐
+ │            GOVERNANCE  —  security/governance.py                      │
+ │                                                                     │
+ │  Healthcare-aware controls for a regulated enterprise.             │
+ │                                                                     │
+ │  detect_phi(text)                                                   │
+ │    Scans for SSN, phone, email, MRN, member ID, DOB.                │
+ │                                                                     │
+ │  redact_phi(text)                                                   │
+ │    Replaces detected PHI with redaction tokens.                       │
+ │                                                                     │
+ │  audit_event(...)                                                   │
+ │    Logs every request, tool call, and escalation.                   │
+ │                                                                     │
+ │  classify_sensitivity(query)                                        │
+ │    Detects sensitive topics (clinical, harassment, termination).    │
+ │                                                                     │
+ │  requires_human_approval(action, role, resource)                    │
+ │    Returns True for high-risk actions like PHI access or payroll.   │
+ └─────────────────────────────────────────────────────────────────────┘
+
+ ┌─────────────────────────────────────────────────────────────────────┐
  │           OBSERVABILITY  —  observability/telemetry.py                │
  │                                                                     │
  │  Cloud Logging                                                      │
@@ -374,6 +441,9 @@ Each specialist agent is a focused mini-assistant for one business domain.
   ├── pyproject.toml           <- Python version and dependencies.
   ├── README.md                <- Quickstart, API, and deployment.
   ├── ARCHITECTURE.md          <- This document.
+  ├── PITCH.md                 <- Executive pitch for healthcare enterprises.
+  ├── GOVERNANCE.md            <- Healthcare AI governance and responsible AI.
+  ├── USE_CASES.md             <- Common enterprise use case mappings.
   │
   ├── data/policies/           <- Sample enterprise documents.
   │
@@ -382,10 +452,12 @@ Each specialist agent is a focused mini-assistant for one business domain.
   │   ├── hr_policy_agent.py
   │   ├── benefits_agent.py
   │   ├── payroll_agent.py
+  │   ├── it_support_agent.py  <- IT support and access requests.
   │   ├── procurement_agent.py
   │   ├── legal_agent.py
   │   ├── compliance_agent.py
-  │   └── facilities_agent.py
+  │   ├── facilities_agent.py
+  │   └── provider_operations_agent.py  <- Provider ops (non-clinical).
   │
   ├── tools/                   <- The connectors to real systems.
   │   └── enterprise_hr_tools.py
@@ -396,8 +468,9 @@ Each specialist agent is a focused mini-assistant for one business domain.
   ├── observability/           <- Logging and tracing setup.
   │   └── telemetry.py
   │
-  ├── security/                <- Credential and guardrail helpers.
-  │   └── iam.py
+  ├── security/                <- Credential, guardrail, and governance helpers.
+  │   ├── iam.py
+  │   └── governance.py
   │
   └── tests/                   <- Unit tests.
 ```
@@ -546,6 +619,23 @@ enterprise environments."
 
 ---
 
+### 11. Why is healthcare-specific governance built into the platform from the start?
+
+**Decision:** Every tool performs PHI detection, audit logging, and sensitivity classification.
+High-risk actions require human approval, and clinical topics are escalated immediately.
+
+**Why:**
+In a healthcare enterprise, a general-purpose AI assistant is not enough. The system must
+demonstrate that it does not expose PHI, does not make clinical decisions, and can be
+audited. Building these controls into the tool layer means they are enforced regardless of
+which agent is running.
+
+**Interview angle:** "We applied defence in depth. Layer 1 is PHI redaction at the tool
+boundary. Layer 2 is audit logging. Layer 3 is human-in-the-loop for high-risk actions.
+This is not an afterthought — it is part of the architecture."
+
+---
+
 ## Glossary — Plain English Definitions
 
 | Term | What it actually means |
@@ -567,3 +657,6 @@ enterprise environments."
 | **Escalation** | Handing a request to a human specialist |
 | **Prompt Injection** | An attack where a user tries to override the agent's instructions |
 | **Guardrail** | A safety check that blocks harmful or disallowed inputs |
+| **PHI** | Protected Health Information — data that identifies a patient or their care |
+| **PII** | Personally Identifiable Information — data that identifies an individual |
+| **Provider Operations** | Non-clinical management of healthcare provider networks (onboarding, credentialing, contracts) |

@@ -56,6 +56,8 @@ PROCUREMENT_MODEL = _optional("PROCUREMENT_MODEL", "gemini-2.5-flash")
 LEGAL_MODEL       = _optional("LEGAL_MODEL",       "gemini-2.5-pro")
 COMPLIANCE_MODEL  = _optional("COMPLIANCE_MODEL",  "gemini-2.5-pro")
 FACILITIES_MODEL  = _optional("FACILITIES_MODEL",  "gemini-2.5-flash")
+IT_SUPPORT_MODEL  = _optional("IT_SUPPORT_MODEL",  "gemini-2.5-flash")
+PROVIDER_OPS_MODEL = _optional("PROVIDER_OPS_MODEL", "gemini-2.5-pro")
 
 for _name, _model in [
     ("ROUTER_MODEL", ROUTER_MODEL),
@@ -66,6 +68,8 @@ for _name, _model in [
     ("LEGAL_MODEL", LEGAL_MODEL),
     ("COMPLIANCE_MODEL", COMPLIANCE_MODEL),
     ("FACILITIES_MODEL", FACILITIES_MODEL),
+    ("IT_SUPPORT_MODEL", IT_SUPPORT_MODEL),
+    ("PROVIDER_OPS_MODEL", PROVIDER_OPS_MODEL),
 ]:
     if _model not in VALID_MODELS:
         raise EnvironmentError(
@@ -90,8 +94,13 @@ EMBEDDING_MODEL   = _optional("EMBEDDING_MODEL", "text-embedding-005")
 # --- Guardrails ---
 SAFETY_ENABLED = _boolean("SAFETY_ENABLED", True)
 
+# --- Healthcare-aware governance ---
+PHI_REDACTION_ENABLED = _boolean("PHI_REDACTION_ENABLED", True)
+AUDIT_LOGGING_ENABLED = _boolean("AUDIT_LOGGING_ENABLED", True)
+HUMAN_APPROVAL_REQUIRED = _boolean("HUMAN_APPROVAL_REQUIRED", True)
+
 # --- App ---
-APP_NAME  = _optional("APP_NAME", "enterprise-hr-assistant")
+APP_NAME  = _optional("APP_NAME", "enterprise-service-assistant")
 LOG_LEVEL = _optional("LOG_LEVEL", "INFO")
 API_HOST  = _optional("API_HOST", "0.0.0.0")
 API_PORT  = int(_optional("API_PORT", "8000"))
