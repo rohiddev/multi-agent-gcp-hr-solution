@@ -87,6 +87,11 @@ def _retrieve_stub(query: str, top_k: int, allowed_sources: list[str]) -> list[d
             "score": 0.85,
         },
         {
+            "content": "Purchases under $1,000 require manager approval. $1,000 to $4,999 require manager and department head. $5,000 and above require manager, department head, and finance.",
+            "source": "purchasing/approval_thresholds.md",
+            "score": 0.86,
+        },
+        {
             "content": "All contracts and NDAs must be reviewed by the legal team before signing.",
             "source": "legal/intake.md",
             "score": 0.84,

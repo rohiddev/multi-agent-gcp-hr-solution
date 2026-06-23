@@ -81,7 +81,8 @@ Examples:
 - Paycheck issue → **Payroll Agent**
 - Laptop request → **IT Support Agent**
 - Vendor contract → **Legal Intake Agent**
-- Purchase request → **Procurement Agent**
+- Purchase request / requisition → **Purchasing Agent**
+- Procurement strategy / sourcing → **Procurement Agent**
 - Badge issue → **Facilities Agent**
 - Training requirement → **Compliance Agent**
 - Provider credentialing → **Provider Operations Agent**
@@ -94,7 +95,8 @@ Examples:
 | Benefits Agent | Medical, dental, 401k, insurance | Eligibility lookup, benefits case |
 | Payroll Agent | Paycheck, deductions, W2, tax | Payroll case, policy check |
 | IT Support Agent | Password resets, laptop, access, MFA | IT ticket creation, knowledge lookup |
-| Procurement Agent | Purchase orders, vendors, invoices | Procurement intake ticket, policy check |
+| Procurement Agent | Vendor strategy, sourcing, invoices | Procurement intake ticket, policy check |
+|| Purchasing Agent | Requisitions, approval thresholds, purchase status | Create requisition, status lookup |
 | Legal Intake Agent | Contracts, NDAs, legal review | Legal intake ticket, human escalation |
 | Compliance Agent | Training, audits, ethics | Training status, compliance ticket |
 | Facilities Agent | Badge, building, parking, maintenance | Facilities ticket, safety escalation |

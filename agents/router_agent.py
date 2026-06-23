@@ -10,6 +10,7 @@ from agents.hr_policy_agent import hr_policy_agent
 from agents.benefits_agent import benefits_agent
 from agents.payroll_agent import payroll_agent
 from agents.procurement_agent import procurement_agent
+from agents.purchasing_agent import purchasing_agent
 from agents.legal_agent import legal_agent
 from agents.compliance_agent import compliance_agent
 from agents.facilities_agent import facilities_agent
@@ -21,8 +22,8 @@ router_agent = LlmAgent(
     model=LiteLlm(model=f"gemini/{ROUTER_MODEL}"),
     description=(
         "Classifies enterprise service requests across HR, benefits, payroll, IT, "
-        "procurement, legal, compliance, facilities, and provider operations, then "
-        "delegates to the right specialist agent."
+        "procurement, purchasing, legal, compliance, facilities, and provider operations, "
+        "then delegates to the right specialist agent."
     ),
     instruction="""
         You are the Enterprise Service Assistant Router. Your only job is to classify the
@@ -37,8 +38,10 @@ router_agent = LlmAgent(
           -> PayrollAgent
         - Password reset, laptop, software install, access, VPN, MFA, system outage
           -> ITSupportAgent
-        - Vendor, purchase order, invoice, procurement, expense, reimbursement
+        - Vendor, purchase order, invoice, procurement strategy, sourcing, expense, reimbursement
           -> ProcurementAgent
+        - Buy something, purchase requisition, approval threshold, purchasing policy, purchase order status
+          -> PurchasingAgent
         - Contract, NDA, legal review, IP, employment agreement, terms
           -> LegalAgent
         - Policy, audit, training, certification, compliance, ethics
@@ -67,6 +70,7 @@ router_agent = LlmAgent(
         payroll_agent,
         it_support_agent,
         procurement_agent,
+        purchasing_agent,
         legal_agent,
         compliance_agent,
         facilities_agent,

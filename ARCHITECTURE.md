@@ -73,8 +73,11 @@ checks whether Alex is allowed to do it, then triggers the action through the co
  │  │  Password reset, laptop, software, access, VPN, MFA       │    │
  │  │    -> IT Support Agent                                      │    │
  │  │                                                             │    │
- │  │  Vendor, purchase order, invoice, reimbursement           │    │
+ │  │  Vendor, sourcing, procurement strategy, invoice, reimbursement │    │
  │  │    -> Procurement Agent                                     │    │
+ │  │                                                             │    │
+ │  │  Buy something, purchase requisition, approval threshold, purchase status │    │
+ │  │    -> Purchasing Agent                                      │    │
  │  │                                                             │    │
  │  │  Contract, NDA, legal review, IP                            │    │
  │  │    -> Legal Agent                                           │    │
@@ -94,7 +97,7 @@ checks whether Alex is allowed to do it, then triggers the action through the co
         ▼
  ┌─────────────────────────────────────────────────────────────────────┐
  │  Specialist Agents (HR Policy, Benefits, Payroll, IT Support,        │
- │  Procurement, Legal, Compliance, Facilities, Provider Operations)     │
+ │  Procurement, Purchasing, Legal, Compliance, Facilities, Provider Operations) │
  └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -165,6 +168,20 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │  Tools:                                                             │
  │   • search_enterprise_knowledge (sources: procurement)             │
  │   • create_service_ticket (system: Procurement)                     │
+ │   • check_policy                                                  │
+ │   • escalate_to_human                                             │
+ └─────────────────────────────────────────────────────────────────────┘
+
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │                    PURCHASING AGENT                                 │
+ │                                                                     │
+ │  "I handle purchase requisitions, purchasing policies, and          │
+ │   purchase order status."                                          │
+ │                                                                     │
+ │  Tools:                                                             │
+ │   • search_enterprise_knowledge (sources: purchasing)              │
+ │   • create_purchase_requisition                                     │
+ │   • get_purchase_requisition_status                                 │
  │   • check_policy                                                  │
  │   • escalate_to_human                                             │
  └─────────────────────────────────────────────────────────────────────┘
@@ -251,6 +268,17 @@ Each specialist agent is a focused mini-assistant for one business domain.
  │  │    1. Guardrail check on summary                              │   │
  │  │    2. Create ticket in ServiceNow / Jira / internal system   │   │
  │  │    3. Return ticket_id and priority                         │   │
+ │  └─────────────────────────────────────────────────────────────┘   │
+ │  ┌─────────────────────────────────────────────────────────────┐   │
+ │  │  create_purchase_requisition                              │   │
+ │  │    1. PHI redaction and guardrail check                     │   │
+ │  │    2. Create requisition in ERP / procurement system         │   │
+ │  │    3. Return requisition_id and approval path                │   │
+ │  └─────────────────────────────────────────────────────────────┘   │
+ │  ┌─────────────────────────────────────────────────────────────┐   │
+ │  │  get_purchase_requisition_status                            │   │
+ │  │    1. Look up requisition status in ERP                     │   │
+ │  │    2. Return state and next steps                             │   │
  │  └─────────────────────────────────────────────────────────────┘   │
  │  ┌─────────────────────────────────────────────────────────────┐   │
  │  │  get_employee_eligibility                                   │   │
@@ -454,6 +482,7 @@ Each specialist agent is a focused mini-assistant for one business domain.
   │   ├── payroll_agent.py
   │   ├── it_support_agent.py  <- IT support and access requests.
   │   ├── procurement_agent.py
+  │   ├── purchasing_agent.py
   │   ├── legal_agent.py
   │   ├── compliance_agent.py
   │   ├── facilities_agent.py

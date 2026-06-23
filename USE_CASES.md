@@ -279,7 +279,34 @@ scripts, and implementation prioritization.
 
 ---
 
-## 13. Hybrid / Remote Work Challenges
+## 13. Purchasing and Requisitioning
+
+**Problem:** Employees need to buy goods or services but do not know the approval thresholds, required information, or how to check the status of a requisition.
+
+**Business Impact:** Delayed purchases, non-compliant spending, frustrated employees, overloaded procurement teams.
+
+**Solution:**
+- Self-service purchase requisition creation
+- Clear approval threshold policies
+- Real-time requisition status lookup
+- Automatic routing to the right approvers
+
+**Agent / Tool Mapping:**
+| Capability | Agent | Tool |
+|---|---|---|
+| Answer purchasing policy | PurchasingAgent | `search_enterprise_knowledge` |
+| Create purchase requisition | PurchasingAgent | `create_purchase_requisition` |
+| Check requisition status | PurchasingAgent | `get_purchase_requisition_status` |
+| High-value / complex purchases | PurchasingAgent | `escalate_to_human` |
+
+**Example Queries:**
+> "How do I buy a new monitor for my desk?"
+> "What approvals do I need for a $6,000 software purchase?"
+> "What is the status of my purchase requisition PR-12345?"
+
+---
+
+## 14. Hybrid / Remote Work Challenges
 
 **Problem:** Employees unsure about remote work eligibility, equipment, office access, or expenses.
 
@@ -303,7 +330,7 @@ scripts, and implementation prioritization.
 
 ---
 
-## 14. Recruitment and Hiring Delays
+## 15. Recruitment and Hiring Delays
 
 **Problem:** Slow hiring, poor candidate experience, manager frustration.
 
@@ -325,7 +352,7 @@ scripts, and implementation prioritization.
 
 ---
 
-## 15. Offboarding and Exit Management
+## 16. Offboarding and Exit Management
 
 **Problem:** Access not revoked, knowledge loss, or incomplete exit process.
 
@@ -365,5 +392,6 @@ scripts, and implementation prioritization.
 | Workforce reporting | ComplianceAgent | `escalate_to_human` |
 | Policy distribution | All specialists | `search_enterprise_knowledge` |
 | Remote work / equipment | FacilitiesAgent, ProcurementAgent | `create_service_ticket` |
+| Purchasing / requisitions | PurchasingAgent | `create_purchase_requisition` |
 | Recruitment | HRPolicyAgent | `create_hr_case` |
 | Offboarding | HRPolicyAgent | `create_hr_case` |

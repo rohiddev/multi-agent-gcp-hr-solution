@@ -29,6 +29,7 @@ Specialist Agents
     ├── PayrollAgent
     ├── ITSupportAgent
     ├── ProcurementAgent
+    ├── PurchasingAgent
     ├── LegalAgent
     ├── ComplianceAgent
     ├── FacilitiesAgent
@@ -100,6 +101,7 @@ multi_agent_gcp_hr_solution/
 │   ├── benefits/
 │   ├── payroll/
 │   ├── procurement/
+│   ├── purchasing/               # Purchasing policy and approval thresholds
 │   ├── legal/
 │   ├── compliance/
 │   ├── facilities/
@@ -112,6 +114,7 @@ multi_agent_gcp_hr_solution/
 │   ├── payroll_agent.py
 │   ├── it_support_agent.py           # IT support and access requests
 │   ├── procurement_agent.py
+│   ├── purchasing_agent.py           # Purchase requisitions and purchasing policy
 │   ├── legal_agent.py
 │   ├── compliance_agent.py
 │   ├── facilities_agent.py
@@ -142,7 +145,8 @@ multi_agent_gcp_hr_solution/
 | **Benefits** | Medical, dental, 401k, insurance, wellness |
 | **Payroll** | Paychecks, deductions, W2, direct deposit |
 | **IT Support** | Password reset, laptop, software install, access, MFA |
-| **Procurement** | Purchase orders, vendors, invoices, reimbursements |
+| **Procurement** | Vendor strategy, sourcing, purchase orders, invoices, reimbursements |
+| **Purchasing** | Buy something, purchase requisition, approval thresholds, purchase status |
 | **Legal** | Contracts, NDAs, legal review, IP |
 | **Compliance** | Training, audits, certifications, ethics |
 | **Facilities** | Badge access, parking, maintenance, rooms |
@@ -212,7 +216,7 @@ deployment patterns managed by the Gemini Enterprise Agent Platform.
 
 | Phase | What to build | Risk |
 |---|---|---|
-| 1 | Router + HR Policy + Benefits + IT Support + stub retrieval | Low |
+| 1 | Router + HR Policy + Benefits + IT Support + Purchasing + stub retrieval | Low |
 | 2 | Add Payroll, Procurement, Legal, Compliance, Facilities | Low |
 | 3 | Add Provider Operations Agent | Medium |
 | 4 | Connect real retrieval backend and enterprise data | Medium |

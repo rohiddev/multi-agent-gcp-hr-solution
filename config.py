@@ -53,6 +53,7 @@ HR_POLICY_MODEL   = _optional("HR_POLICY_MODEL",   "gemini-2.5-flash")
 BENEFITS_MODEL    = _optional("BENEFITS_MODEL",    "gemini-2.5-flash")
 PAYROLL_MODEL     = _optional("PAYROLL_MODEL",     "gemini-2.5-flash")
 PROCUREMENT_MODEL = _optional("PROCUREMENT_MODEL", "gemini-2.5-flash")
+PURCHASING_MODEL  = _optional("PURCHASING_MODEL",  "gemini-2.5-flash")
 LEGAL_MODEL       = _optional("LEGAL_MODEL",       "gemini-2.5-pro")
 COMPLIANCE_MODEL  = _optional("COMPLIANCE_MODEL",  "gemini-2.5-pro")
 FACILITIES_MODEL  = _optional("FACILITIES_MODEL",  "gemini-2.5-flash")
@@ -65,6 +66,7 @@ for _name, _model in [
     ("BENEFITS_MODEL", BENEFITS_MODEL),
     ("PAYROLL_MODEL", PAYROLL_MODEL),
     ("PROCUREMENT_MODEL", PROCUREMENT_MODEL),
+    ("PURCHASING_MODEL", PURCHASING_MODEL),
     ("LEGAL_MODEL", LEGAL_MODEL),
     ("COMPLIANCE_MODEL", COMPLIANCE_MODEL),
     ("FACILITIES_MODEL", FACILITIES_MODEL),

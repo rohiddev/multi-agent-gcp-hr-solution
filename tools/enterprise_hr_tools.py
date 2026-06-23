@@ -240,6 +240,89 @@ def escalate_to_human(
         return {"status": "error", "message": str(e)}
 
 
+def create_purchase_requisition(
+    item_description: str,
+    quantity: int,
+    estimated_cost: float,
+    business_justification: str,
+    user_id: str = "unknown",
+    session_id: str = "unknown",
+) -> dict:
+    """Create a purchase requisition in the enterprise purchasing system.
+
+    Args:
+        item_description: Description of the item or service to purchase.
+        quantity: Number of units requested.
+        estimated_cost: Estimated total cost in USD.
+        business_justification: Reason for the purchase.
+        user_id: Identity of the requester for audit logging.
+        session_id: Session ID for audit logging.
+
+    Returns:
+        dict with status and requisition_id.
+    """
+    try:
+        combined = f"{item_description} {business_justification}".strip()
+        phi = detect_phi(combined)
+        if phi["found"]:
+            item_description = redact_phi(item_description)
+            business_justification = redact_phi(business_justification)
+            audit_event(user_id, session_id, "phi_redacted", tool="create_purchase_requisition", details=phi)
+
+        guard = apply_guardrail(combined)
+        if guard["action"] == "BLOCKED":
+            audit_event(user_id, session_id, "guardrail_blocked", tool="create_purchase_requisition", details=guard)
+            return {"status": "blocked", "reason": guard["reason"]}
+
+        # Determine approval path based on estimated cost.
+        if estimated_cost >= 5000:
+            approval_path = "manager + finance + department_head"
+        elif estimated_cost >= 1000:
+            approval_path = "manager + department_head"
+        else:
+            approval_path = "manager"
+
+        logger.info("create_purchase_requisition item=%s cost=%s qty=%s", item_description, estimated_cost, quantity)
+        audit_event(user_id, session_id, "create_purchase_requisition", tool="create_purchase_requisition", status="success", details={"estimated_cost": estimated_cost, "approval_path": approval_path})
+        # TODO: call ERP / procurement system API (e.g. SAP Ariba, Coupa, Workday)
+        return {
+            "status": "success",
+            "requisition_id": f"PR-{hash(item_description) % 100000:05d}",
+            "approval_path": approval_path,
+        }
+    except Exception as e:
+        logger.exception("create_purchase_requisition failed")
+        audit_event(user_id, session_id, "create_purchase_requisition", tool="create_purchase_requisition", status="error", details={"error": str(e)})
+        return {"status": "error", "message": str(e)}
+
+
+def get_purchase_requisition_status(requisition_id: str, user_id: str = "unknown", session_id: str = "unknown") -> dict:
+    """Look up the status of a purchase requisition.
+
+    Args:
+        requisition_id: The purchase requisition identifier.
+        user_id: Identity of the requester for audit logging.
+        session_id: Session ID for audit logging.
+
+    Returns:
+        dict with status, requisition state, and next steps.
+    """
+    try:
+        logger.info("get_purchase_requisition_status requisition_id=%s", requisition_id)
+        audit_event(user_id, session_id, "get_purchase_requisition_status", tool="get_purchase_requisition_status", status="success", details={"requisition_id": requisition_id})
+        # TODO: call ERP / procurement system API
+        return {
+            "status": "success",
+            "requisition_id": requisition_id,
+            "state": "pending_approval",
+            "next_steps": "Awaiting manager approval.",
+        }
+    except Exception as e:
+        logger.exception("get_purchase_requisition_status failed requisition_id=%s", requisition_id)
+        audit_event(user_id, session_id, "get_purchase_requisition_status", tool="get_purchase_requisition_status", status="error", details={"error": str(e)})
+        return {"status": "error", "message": str(e)}
+
+
 def summarize_case(case_text: str, user_id: str = "unknown", session_id: str = "unknown") -> dict:
     """Summarize a long case or ticket thread for a human reviewer.
 
