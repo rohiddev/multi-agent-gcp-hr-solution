@@ -1,16 +1,16 @@
-# Executive Pitch — Optum Enterprise Service Agent Platform
+# Executive Pitch — Enterprise Service Agent Platform
 
 ## One-sentence value proposition
 
-Build a single, governed, AI-powered front door for Optum and UHG employees and
-operations teams to get answers, create tickets, and route requests across HR, IT,
-procurement, legal, compliance, facilities, and provider operations.
+Build a single, governed, AI-powered front door for employees and
+operations teams in a healthcare enterprise to get answers, create tickets, and route
+requests across HR, IT, procurement, legal, compliance, facilities, and provider operations.
 
 ---
 
 ## The problem
 
-Optum and UnitedHealth Group operate at massive scale across healthcare delivery,
+A healthcare enterprise operates at massive scale across healthcare delivery,
 insurance, pharmacy, and technology. Employees and operations teams face:
 
 - **Fragmented support channels:** HR, IT, procurement, legal, compliance, and facilities
@@ -26,7 +26,7 @@ The result is frustrated employees, overloaded operations teams, and unnecessary
 
 ## The solution
 
-**Optum Enterprise Service Agent Platform** — a multi-agent assistant built with Google ADK
+**Enterprise Service Agent Platform** — a multi-agent assistant built with Google ADK
 and Gemini Enterprise Agent Platform.
 
 ```
@@ -158,21 +158,21 @@ Built-in controls:
 
 ---
 
-## Why this fits Optum / UHG
+## Why this fits healthcare enterprise
 
 - **Scale:** Handles thousands of daily employee and operations requests.
 - **Governance:** Meets healthcare expectations for PHI protection, auditability, and
   human oversight.
 - **Platform thinking:** A reusable agent pattern that can expand to other use cases beyond
   enterprise services.
-- **Responsible AI:** Aligns with UHG/Optum public commitments to responsible AI in healthcare.
+- **Responsible AI:** Aligns with public commitments to responsible AI in healthcare.
 - **Cost efficiency:** Reduces manual support cost while improving service quality.
 
 ---
 
 ## Executive summary
 
-The Optum Enterprise Service Agent Platform turns fragmented internal support into a single,
+The Enterprise Service Agent Platform turns fragmented internal support into a single,
 governed AI-powered experience. It uses Google ADK to build specialist agents, Gemini for
 reasoning, Vertex AI for trusted retrieval, and Gemini Enterprise Agent Platform for
 enterprise-scale governance and deployment. For a healthcare organization, it is designed

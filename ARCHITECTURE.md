@@ -3,8 +3,7 @@
 This document explains how the system works piece by piece, using simple diagrams and
 plain English. It also includes a "Key Design Decisions" section useful for interviews.
 
-This solution is designed for a healthcare enterprise context such as UnitedHealth Group
-or Optum. It is positioned as an **enterprise service and operations assistant** — not a
+This solution is designed for a healthcare enterprise context. It is positioned as an **enterprise service and operations assistant** — not a
 clinical diagnosis or patient-care system. Built-in governance includes PHI detection,
 audit logging, human-in-the-loop controls, and responsible AI guardrails.
 

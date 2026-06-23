@@ -2,7 +2,7 @@
 
 This document describes the governance, security, and responsible AI controls built into
 the Enterprise Service Agent Platform. It is designed for a healthcare enterprise context
-such as UnitedHealth Group / Optum, where trust, compliance, and auditability are critical.
+where trust, compliance, and auditability are critical.
 
 ---
 

@@ -1,7 +1,7 @@
 """
 Healthcare-aware governance controls for the enterprise service assistant.
 
-For a healthcare organization like UnitedHealth Group / Optum, this agent platform is
+For a healthcare organization, this agent platform is
 positioned as an ENTERPRISE SERVICE and OPERATIONS assistant, NOT a clinical
 diagnosis or patient-care decision system. Clinical use cases require separate,
 regulated workflows and FDA/healthcare compliance review.

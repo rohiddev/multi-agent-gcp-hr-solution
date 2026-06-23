@@ -5,8 +5,7 @@ operations teams find answers and complete common internal service requests acro
 benefits, payroll, IT support, procurement, legal, compliance, facilities, and provider
 operations.
 
-This solution is designed for a healthcare enterprise context such as UnitedHealth Group
-or Optum, with strong governance, PHI protection, audit logging, and responsible AI
+This solution is designed for a healthcare enterprise context, with strong governance, PHI protection, audit logging, and responsible AI
 controls. It is positioned as an **enterprise service and operations assistant**, not a
 clinical diagnosis or patient-care system.
 

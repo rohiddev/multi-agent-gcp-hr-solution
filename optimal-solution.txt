@@ -1,6 +1,6 @@
 Why This Architecture Is an Optimal Solution for Enterprise Service Use Cases
 
-This architecture is optimal for an enterprise service use case because it solves the core problem of fragmented internal support while meeting the governance, scale, and accuracy requirements of a large organization like UHG/Optum.
+This architecture is optimal for an enterprise service use case because it solves the core problem of fragmented internal support while meeting the governance, scale, and accuracy requirements of a large healthcare enterprise.
 
 1. Single Intelligent Front Door
 Most enterprises have separate portals for HR, IT, procurement, legal, compliance, and facilities. Employees waste time figuring out where to go.
@@ -67,4 +67,4 @@ It is optimal because it combines:
 6. Scalable infrastructure (ADK + Gemini Enterprise Agent Platform)
 7. Platform extensibility (add new domains easily)
 
-This is why it fits a healthcare enterprise like UHG/Optum: it is a governed, scalable, self-service operations platform that reduces cost while improving employee and provider experience.
+This is why it fits a healthcare enterprise: it is a governed, scalable, self-service operations platform that reduces cost while improving employee and provider experience.
